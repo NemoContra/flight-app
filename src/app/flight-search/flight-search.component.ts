@@ -8,15 +8,22 @@ import {
 } from '@angular/core';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
 import { WrappedButtonComponent } from './wrapped-button.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FlightCardComponent } from '../flight-card/flight-card.component';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
   templateUrl: './flight-search.component.html',
-  imports: [FormsModule, DatePipe, WrappedButtonComponent],
+  imports: [
+    FormsModule,
+    DatePipe,
+    WrappedButtonComponent,
+    FlightCardComponent,
+    JsonPipe,
+  ],
   styleUrl: './flight-search.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,8 +35,14 @@ export class FlightSearchComponent {
 
   message = signal<string>('');
 
+  basket = signal<Record<number, boolean>>({});
+
   private httpClient = inject(HttpClient);
   private destroyRef = inject(DestroyRef);
+
+  updateBasket(id: number, selected: boolean): void {
+    this.basket.update((basket) => ({ ...basket, [id]: selected }));
+  }
 
   search(): void {
     this.message.set('');

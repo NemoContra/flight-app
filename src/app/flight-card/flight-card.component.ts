@@ -14,7 +14,7 @@ import { CityPipe } from '../shared/city.pipe';
   standalone: true,
   imports: [CityPipe, NgClass, NgStyle, DatePipe],
   templateUrl: './flight-card.component.html',
-  styleUrls: ['./flight-card.component.css'],
+  styleUrls: ['./flight-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightCardComponent {

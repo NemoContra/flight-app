@@ -1,0 +1,44 @@
+<h1 matDialogTitle>Edit Flight</h1>
+<mat-dialog-content>
+  <form #form="ngForm">
+    @if (!form?.controls?.["from"]?.valid) {
+      <div class="alert alert-danger">Validation errors in 'from'.</div>
+    }
+    @if (form?.controls?.["from"]?.hasError("required")) {
+      <div class="alert alert-danger">The field 'from' is required!</div>
+    }
+    @if (form?.controls?.["from"]?.hasError("minlength")) {
+      <div class="alert alert-danger">
+        The field 'from' needs to have at least
+        {{ form?.controls?.["from"]?.errors?.["minlength"]?.requiredLength }}
+        characters.
+      </div>
+    }
+    @if (!form?.controls?.["from"]?.valid) {
+      <div class="alert alert-danger">
+        Internal error object: {{ form?.controls?.["from"]?.errors | json }}
+      </div>
+    }
+
+    <div>
+      <input name="id" [(ngModel)]="flight.id" />
+      <input name="from" [(ngModel)]="flight.from" required minlength="3" />
+      <input name="to" [(ngModel)]="flight.to" />
+      <input name="date" [(ngModel)]="flight.date" />
+    </div>
+
+    <div>
+      <input
+        name="delayed"
+        id="delayed"
+        [(ngModel)]="flight.delayed"
+        type="checkbox"
+      />
+      <label for="delayed">Delayed</label>
+    </div>
+
+    <div>
+      <button (click)="close()" class="btn btn-default">Close</button>
+    </div>
+  </form>
+</mat-dialog-content>

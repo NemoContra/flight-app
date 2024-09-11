@@ -1,13 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  inject,
   input,
   model,
 } from '@angular/core';
 import { DatePipe, NgClass, NgStyle } from '@angular/common';
 import { Flight } from '../model/flight';
 import { CityPipe } from '../shared/city.pipe';
+import { MatDialog } from '@angular/material/dialog';
+import { FlightEditComponent } from '../flight-edit/flight-edit.component';
 
 @Component({
   selector: 'app-flight-card',
@@ -23,5 +25,13 @@ export class FlightCardComponent {
 
   toggleSelected() {
     this.selected.update((selected) => !selected);
+  }
+
+  dialog = inject(MatDialog);
+
+  edit() {
+    this.dialog.open(FlightEditComponent, {
+      data: { flight: this.item() },
+    });
   }
 }

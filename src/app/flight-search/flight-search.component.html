@@ -2,7 +2,7 @@
   <h2 class="title">Flight Search</h2>
 </div>
 
-<form #form="ngForm">
+<form>
   <div class="form-group">
     <label>From:</label>
     <input [(ngModel)]="from" name="from" class="form-control" required />
@@ -30,11 +30,11 @@
 <div class="row">
   @for (f of flightStore.flights(); track f.id) {
     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-      <app-flight-card
-        [item]="f"
-        [selected]="flightStore.basket()[f.id]"
-        (selectedChange)="flightStore.updateBasket(f.id, $event)"
-      />
+      @defer (on viewport) {
+        <div>lorem ipsum</div>
+      } @placeholder {
+        <div>Loading...</div>
+      }
     </div>
   }
 </div>

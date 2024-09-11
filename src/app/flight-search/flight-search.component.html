@@ -17,7 +17,8 @@
   </div>
 </form>
 
-@if (flights.length > 0) {
+@if (flights().length > 0) {
+  {{ foundMessage() }}
   <table class="table table-condensed">
     <thead>
       <tr>
@@ -29,8 +30,8 @@
       </tr>
     </thead>
     <tbody>
-      @for (f of flights; track f.id) {
-        <tr [class.selected]="f.id === selectedFlight?.id">
+      @for (f of flights(); track f.id) {
+        <tr [class.selected]="f.id === selectedFlight()?.id">
           <td>{{ f.id }}</td>
           <td>{{ f.from }}</td>
           <td>{{ f.to }}</td>
@@ -44,9 +45,9 @@
   </table>
 }
 
-@if (selectedFlight) {
+@if (selectedFlight(); as selectedFlight) {
   <div>
-    @if (message) {
+    @if (message(); as message) {
       <div class="alert alert-primary">
         {{ message }}
       </div>

@@ -1,48 +1,57 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { WrappedButtonComponent } from './wrapped-button.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { injectFlights } from '../inject-flights';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
   templateUrl: './flight-search.component.html',
-  imports: [FormsModule, DatePipe, WrappedButtonComponent],
+  imports: [FormsModule, DatePipe],
   styleUrl: './flight-search.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightSearchComponent {
-  from = 'London';
-  to = 'Paris';
-  flights: Flight[] = [];
-  selectedFlight: Flight | undefined;
+  from = signal<string>('London');
+  to = signal<string>('Paris');
+  flights = signal<Flight[]>([]);
+  selectedFlight = signal<Flight | undefined>(undefined);
 
-  message = '';
+  flightService = injectFlights();
 
-  private httpClient = inject(HttpClient);
+  foundMessage = computed(() => {
+    console.log('computed', this.flights().length);
+    return `Found ${this.flights().length} flights`;
+  });
+
+  message = signal<string>('');
+
   private destroyRef = inject(DestroyRef);
 
   search(): void {
-    this.message = '';
-    this.selectedFlight = undefined;
+    this.message.set('');
+    this.selectedFlight.set(undefined);
 
-    const params = { from: this.from, to: this.to };
+    const params = { from: this.from(), to: this.to() };
 
-    const headers = {
-      Accept: 'application/json',
-    };
-
-    this.httpClient
-      .get<Flight[]>('https://demo.angulararchitects.io/api/flight', {
-        params,
-        headers,
-      })
+    this.flightService
+      .getFlights(params)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (flights) => {
-          this.flights = flights;
+          this.flights.set(flights);
         },
         error: (errResp) => {
           console.error('Error loading flights', errResp);
@@ -51,30 +60,25 @@ export class FlightSearchComponent {
   }
 
   save(): void {
-    if (!this.selectedFlight) return;
+    const selectedFlight = this.selectedFlight();
+    if (!selectedFlight) return;
 
-    const url = 'https://demo.angulararchitects.io/api/flight';
-
-    const headers = {
-      Accept: 'application/json',
-    };
-
-    this.httpClient
-      .post<Flight>(url, this.selectedFlight, { headers })
+    this.flightService
+      .saveFlight(selectedFlight)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (flight: Flight) => {
-          this.selectedFlight = flight;
-          this.message = 'Update successful!';
+          this.selectedFlight.set(flight);
+          this.message.set('Update successful!');
         },
         error: (errResponse: HttpErrorResponse) => {
-          this.message = 'Error on updating the Flight';
+          this.message.set('Error on updating the Flight');
           console.error(this.message, errResponse);
         },
       });
   }
 
   select(flight: Flight): void {
-    this.selectedFlight = { ...flight };
+    this.selectedFlight.set(flight);
   }
 }

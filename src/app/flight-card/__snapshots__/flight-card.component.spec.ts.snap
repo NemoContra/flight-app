@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FlightCardComponent should render a card 1`] = `
+<lib-ngneat-host-component
+  item={[Function Object]}
+>
+  <app-flight-card
+    selected="false"
+  >
+    <div
+      class="card selected"
+    >
+      <div
+        class="card-header"
+      >
+        <h2
+          class="title"
+        >
+           LCY - Charles de Gaulle Airport 
+        </h2>
+      </div>
+      <div
+        class="card-body"
+      >
+        <p>
+          Flight-No.: #1
+        </p>
+        <p>
+          Date: 24.12.2021 13:00
+        </p>
+        <p>
+           Delayed: false 
+        </p>
+        <p>
+          <button
+            class="btn btn-default"
+          >
+             Remove
+          </button>
+          <button
+            class="btn btn-default"
+          >
+            Edit
+          </button>
+        </p>
+      </div>
+    </div>
+  </app-flight-card>
+</lib-ngneat-host-component>
+`;

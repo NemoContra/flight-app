@@ -1,37 +1,40 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from './flight.service';
-import { CityPipe } from '../shared/city.pipe';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.css'],
-  imports: [CommonModule, FormsModule, FlightCardComponent],
+  imports: [FormsModule, FlightCardComponent, JsonPipe],
 })
 export class FlightSearchComponent {
   from = 'London';
   to = 'Paris';
   flights: Array<Flight> = [];
-  selectedFlight: Flight | undefined;
   message = '';
 
-  basket: Record<number, boolean> = {
+  basket = signal<Record<number, boolean>>({
     3: true,
     5: true,
-  };
+  });
+
+  flightSearchModel = signal({
+    from: 'London',
+    to: 'Paris',
+  });
+
+  flightSearchForm = form();
 
   private flightService = inject(FlightService);
 
   search(): void {
     // Reset properties
     this.message = '';
-    this.selectedFlight = undefined;
 
     this.flightService.find(this.from, this.to).subscribe({
       next: (flights) => {
@@ -41,9 +44,5 @@ export class FlightSearchComponent {
         console.error('Error loading flights', errResp);
       },
     });
-  }
-
-  select(f: Flight): void {
-    this.selectedFlight = { ...f };
   }
 }

@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
-import { Flight, FlightService } from '@flight-demo/tickets/domain';
-
-// import { TicketDataService } from '@flight-demo/checkin/domain';
+import { Flight } from '@flight-demo/tickets/domain';
+import { injectFlightFacade } from './+store/flight-facade';
+import { FlightStore } from './+store/flight-store';
 
 @Component({
   selector: 'app-flight-search',
@@ -12,39 +12,34 @@ import { Flight, FlightService } from '@flight-demo/tickets/domain';
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.css'],
   imports: [CommonModule, FormsModule, FlightCardComponent],
+  providers: [FlightStore],
 })
 export class FlightSearchComponent {
-  from = 'London';
-  to = 'Paris';
-  flights: Array<Flight> = [];
-  selectedFlight: Flight | undefined;
+  flightFacade = injectFlightFacade();
 
-  basket: Record<number, boolean> = {
-    3: true,
-    5: true,
-  };
-
-  private flightService = inject(FlightService);
+  ctx = signal({
+    from: signal(''),
+    to: signal(''),
+  });
 
   search(): void {
-    if (!this.from || !this.to) {
-      return;
-    }
+    const from = this.ctx().from();
+    const to = this.ctx().to();
+    this.flightFacade.load({ from, to });
+  }
 
-    // Reset properties
-    this.selectedFlight = undefined;
+  select(flight: Flight): void {
+    this.flightFacade.select(flight);
+  }
 
-    this.flightService.find(this.from, this.to).subscribe({
-      next: (flights) => {
-        this.flights = flights;
-      },
-      error: (errResp) => {
-        console.error('Error loading flights', errResp);
-      },
+  reset() {
+    this.ctx.set({
+      from: signal(''),
+      to: signal(''),
     });
   }
 
-  select(f: Flight): void {
-    this.selectedFlight = { ...f };
+  updateBasket(id: number) {
+    this.flightFacade.updateBasket(id);
   }
 }

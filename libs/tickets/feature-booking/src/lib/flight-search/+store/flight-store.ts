@@ -25,7 +25,7 @@ export const searchEvents = eventGroup({
 export const basketEvents = eventGroup({
   source: 'basket',
   events: {
-    toggle: type<number>(),
+    updateBasket: type<number>(),
   },
 });
 
@@ -64,7 +64,7 @@ export const FlightStore = signalStore(
     on(searchEvents.select, ({ payload: selectedFlight }) => ({
       selectedFlight,
     })),
-    on(basketEvents.toggle, ({ payload: id }, { basket }) => ({
+    on(basketEvents.updateBasket, ({ payload: id }, { basket }) => ({
       basket: {
         ...basket,
         [id]: !basket[id],

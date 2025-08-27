@@ -42,6 +42,7 @@
     "es-module-shims": "^1.5.12",
     "rxjs": "7.8.1",
     "tslib": "^2.5.2",
+    "zod": "^3.25.76",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

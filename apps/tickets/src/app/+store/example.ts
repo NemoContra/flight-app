@@ -23,4 +23,4 @@ const delayedFlight = {
 
 export const parsedFlight = FlightSchema.parse(flight);
 
-console.log({ flight, delayedFlight });
+console.log({ flight, delayedFlight, parsedFlight });

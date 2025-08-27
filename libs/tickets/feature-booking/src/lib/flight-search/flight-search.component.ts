@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
-import { FlightSearchStore } from './+store/flight-search';
 import { JsonPipe } from '@angular/common';
+import { injectFlightSearchFacade } from './+store/flight-search-facade';
 
 @Component({
   selector: 'app-flight-search',
@@ -10,8 +10,7 @@ import { JsonPipe } from '@angular/common';
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.css'],
   imports: [FormsModule, FlightCardComponent, JsonPipe],
-  providers: [FlightSearchStore],
 })
 export class FlightSearchComponent {
-  flightSearchStore = inject(FlightSearchStore);
+  flightSearchFacade = injectFlightSearchFacade();
 }

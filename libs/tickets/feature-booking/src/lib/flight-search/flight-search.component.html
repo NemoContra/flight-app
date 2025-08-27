@@ -6,18 +6,27 @@
   <div class="form-group">
     <label>From:</label>
     <input
-      [(ngModel)]="flightSearchStore.from"
+      [(ngModel)]="flightSearchFacade.from"
       name="from"
       class="form-control"
     />
   </div>
   <div class="form-group">
     <label>To:</label>
-    <input [(ngModel)]="flightSearchStore.to" name="to" class="form-control" />
+    <input [(ngModel)]="flightSearchFacade.to" name="to" class="form-control" />
   </div>
 
   <div class="form-group">
-    <button (click)="flightSearchStore.search()" class="btn btn-default">
+    <button
+      (click)="
+        flightSearchFacade.search({
+          from: flightSearchFacade.from(),
+          to: flightSearchFacade.to(),
+          urgent: flightSearchFacade.urgent()
+        })
+      "
+      class="btn btn-default"
+    >
       Search
     </button>
   </div>
@@ -25,16 +34,19 @@
   <div class="form-group">
     <input
       type="checkbox"
-      [(ngModel)]="flightSearchStore.urgent"
+      [(ngModel)]="flightSearchFacade.urgent"
       name="urgent"
     />
   </div>
 </form>
 
 <div class="row">
-  @for(f of flightSearchStore.flights(); track f.id) {
+  @for(f of flightSearchFacade.flights(); track f.id) {
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
-    <app-flight-card [item]="f" [(selected)]="flightSearchStore.basket()[f.id]">
+    <app-flight-card
+      [item]="f"
+      [(selected)]="flightSearchFacade.basket()[f.id]"
+    >
       <p class="middle"><i>Delays are possible!</i></p>
       <p class="bottom"><small>Statement without guarantee!</small></p>
     </app-flight-card>
@@ -43,5 +55,5 @@
 </div>
 
 <div>
-  <pre>{{ flightSearchStore.basket() | json }}</pre>
+  <pre>{{ flightSearchFacade.basket() | json }}</pre>
 </div>

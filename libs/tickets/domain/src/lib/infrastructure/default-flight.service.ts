@@ -9,8 +9,10 @@ export class DefaultFlightService implements FlightService {
   private http = inject(HttpClient);
   private configService = inject(ConfigService);
 
-  find(from: string, to: string): Observable<Flight[]> {
-    const url = `${this.configService.config.baseUrl}/flight`;
+  find(from: string, to: string, urgent = false): Observable<Flight[]> {
+    let url = `${this.configService.config.baseUrl}/flight`;
+
+    if (urgent) url = url.concat('lol');
 
     const headers = {
       Accept: 'application/json',

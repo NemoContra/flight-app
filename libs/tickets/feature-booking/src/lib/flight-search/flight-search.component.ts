@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
-import { Flight, FlightService } from '@flight-demo/tickets/domain';
+import { Flight } from '@flight-demo/tickets/domain';
+import { injectFlightSearchFacade } from './+store/flight-search-facade';
 
 // import { TicketDataService } from '@flight-demo/checkin/domain';
 
@@ -14,35 +15,18 @@ import { Flight, FlightService } from '@flight-demo/tickets/domain';
   imports: [CommonModule, FormsModule, FlightCardComponent],
 })
 export class FlightSearchComponent {
-  from = 'London';
-  to = 'Paris';
-  flights: Array<Flight> = [];
+  flightSearchFacade = injectFlightSearchFacade();
+
+  from = signal('Hamburg');
+  to = signal('Paris');
+  urgent = signal(false);
+
   selectedFlight: Flight | undefined;
 
   basket: Record<number, boolean> = {
     3: true,
     5: true,
   };
-
-  private flightService = inject(FlightService);
-
-  search(): void {
-    if (!this.from || !this.to) {
-      return;
-    }
-
-    // Reset properties
-    this.selectedFlight = undefined;
-
-    this.flightService.find(this.from, this.to).subscribe({
-      next: (flights) => {
-        this.flights = flights;
-      },
-      error: (errResp) => {
-        console.error('Error loading flights', errResp);
-      },
-    });
-  }
 
   select(f: Flight): void {
     this.selectedFlight = { ...f };

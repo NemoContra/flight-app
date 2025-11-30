@@ -2,18 +2,36 @@
   <h2 class="title">Flight Search</h2>
 </div>
 
-<form>
+<form (submit)="$event.preventDefault(); search()">
   <div class="form-group">
     <label>From:</label>
-    <input [(ngModel)]="from" name="from" class="form-control" />
+    @let from = flightSearchForm.from;
+    <input
+      [field]="from"
+      class="form-control"
+      [class.invalid]="from().invalid()"
+      [class.touched]="from().touched()"
+    />
+    @for (error of from().errors(); track error) {
+      <pre class="error">{{ error.message }}</pre>
+    }
   </div>
   <div class="form-group">
     <label>To:</label>
-    <input [(ngModel)]="to" name="to" class="form-control" />
+    @let to = flightSearchForm.to;
+    <input
+      [field]="to"
+      class="form-control"
+      [class.invalid]="to().invalid()"
+      [class.touched]="to().touched()"
+    />
+    @for (error of to().errors(); track error) {
+      <pre class="error">{{ error.message }}</pre>
+    }
   </div>
 
   <div class="form-group">
-    <button (click)="search()" class="btn btn-default">Search</button>
+    <button type="submit" class="btn btn-default">Search</button>
   </div>
 </form>
 

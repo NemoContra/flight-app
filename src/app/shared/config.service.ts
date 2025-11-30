@@ -4,7 +4,8 @@ import {
   inject,
   Injectable,
   makeEnvironmentProviders,
-  provideEnvironmentInitializer
+  provideEnvironmentInitializer,
+  signal,
 } from '@angular/core';
 import { Config, initConfig } from './config';
 
@@ -13,25 +14,23 @@ import { Config, initConfig } from './config';
 })
 export class ConfigService {
   private http = inject(HttpClient);
-  private _config = initConfig;
 
-  get config(): Config {
-    return { ...this._config };
-  }
+  config = signal<Config | undefined>(undefined);
 
   constructor() {}
 
   loadConfig() {
     this.http.get<Config>('./assets/config.json').subscribe((config) => {
-      this._config = config;
+      this.config.set(config);
     });
   }
 }
 
-export const provideConfigService = () => makeEnvironmentProviders([
-  ConfigService,
-  provideEnvironmentInitializer(() => {
-    const configService = inject(ConfigService);
-    configService.loadConfig();
-  })
-])
+export const provideConfigService = () =>
+  makeEnvironmentProviders([
+    ConfigService,
+    provideEnvironmentInitializer(() => {
+      const configService = inject(ConfigService);
+      configService.loadConfig();
+    }),
+  ]);

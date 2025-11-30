@@ -12,7 +12,7 @@ export class FlightService {
   private configService = inject(ConfigService);
 
   find(from: string, to: string): Observable<Flight[]> {
-    const url = `${this.configService.config.baseUrl}/flight`;
+    const url = `${this.configService.config()?.baseUrl}/flight`;
 
     const headers = {
       Accept: 'application/json',

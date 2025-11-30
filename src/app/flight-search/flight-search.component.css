@@ -1,0 +1,7 @@
+.error {
+  color: red;
+}
+
+.invalid.touched {
+  outline: 1px solid red !important;
+}

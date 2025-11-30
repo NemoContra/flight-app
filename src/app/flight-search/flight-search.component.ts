@@ -1,37 +1,37 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
+import { FlightService } from './flight.service';
+import { FlightCardComponent } from '../flight-card/flight-card.component';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.css'],
+  imports: [CommonModule, FormsModule, FlightCardComponent],
 })
 export class FlightSearchComponent {
   from = signal('London');
   to = signal('Paris');
   flights = signal<Flight[]>([]);
   selectedFlight = signal<Flight | undefined>(undefined);
+  message = signal('');
 
-  private http = inject(HttpClient);
+  basket = signal<Record<number, boolean>>({
+    3: true,
+    5: true,
+  });
+
+  private flightService = inject(FlightService);
 
   search(): void {
-    const url = 'https://demo.angulararchitects.io/api/flight';
+    // Reset properties
+    this.message.set('');
+    this.selectedFlight.set(undefined);
 
-    const headers = {
-      Accept: 'application/json',
-    };
-
-    const params = {
-      from: this.from(),
-      to: this.to(),
-    };
-
-    this.http.get<Flight[]>(url, { headers, params }).subscribe({
+    this.flightService.find(this.from(), this.to()).subscribe({
       next: (flights) => {
         this.flights.set(flights);
       },
@@ -42,6 +42,6 @@ export class FlightSearchComponent {
   }
 
   select(f: Flight): void {
-    this.selectedFlight.set(f);
+    this.selectedFlight.set({ ...f });
   }
 }

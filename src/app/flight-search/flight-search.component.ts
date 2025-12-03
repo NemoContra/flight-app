@@ -1,22 +1,49 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from './flight.service';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
 import { JsonPipe } from '@angular/common';
+import {
+  debounce,
+  Field,
+  form,
+  required,
+  validate,
+  validateHttp,
+  validateStandardSchema,
+  validateTree,
+} from '@angular/forms/signals';
+import { httpResource } from '@angular/common/http';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.css'],
-  imports: [FormsModule, FlightCardComponent, JsonPipe],
+  imports: [FormsModule, FlightCardComponent, JsonPipe, Field],
 })
 export class FlightSearchComponent {
-  from = 'London';
-  to = 'Paris';
-  flights: Array<Flight> = [];
-  message = '';
+  flightsResource = httpResource<Flight[]>(() => {
+    const url = `https://demo.angulararchitects.io/api/flight`;
+
+    const headers = {
+      Accept: 'application/json',
+    };
+
+    if (this.flightSearchForm().invalid()) {
+      return;
+    }
+
+    const { from, to } = this.flightSearchForm().value();
+
+    const params = { from, to };
+
+    return { url, headers, params };
+  });
+
+  flights = computed(() => this.flightsResource.value() ?? []);
+  flightsLoading = this.flightsResource.isLoading;
 
   basket = signal<Record<number, boolean>>({
     3: true,
@@ -28,21 +55,24 @@ export class FlightSearchComponent {
     to: 'Paris',
   });
 
-  flightSearchForm = form();
+  flightSearchForm = form(this.flightSearchModel, (path) => {
+    required(path.from);
+    required(path.to);
+    debounce(path.from, 300);
+    debounce(path.to, 300);
 
-  private flightService = inject(FlightService);
+    validateTree(path, (ctx) => {
+      const { from, to } = ctx.value();
 
-  search(): void {
-    // Reset properties
-    this.message = '';
+      if (from === to) {
+        return {
+          kind: 'roundTrip',
+          message: 'From and To must be different',
+          field: ctx.field.to,
+        };
+      }
 
-    this.flightService.find(this.from, this.to).subscribe({
-      next: (flights) => {
-        this.flights = flights;
-      },
-      error: (errResp) => {
-        console.error('Error loading flights', errResp);
-      },
+      return null;
     });
-  }
+  });
 }

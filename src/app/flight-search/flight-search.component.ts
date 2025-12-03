@@ -1,7 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
-import { FlightService } from './flight.service';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
 import { JsonPipe } from '@angular/common';
 import {
@@ -9,9 +8,6 @@ import {
   Field,
   form,
   required,
-  validate,
-  validateHttp,
-  validateStandardSchema,
   validateTree,
 } from '@angular/forms/signals';
 import { httpResource } from '@angular/common/http';
